@@ -259,6 +259,36 @@
          // PWA 설치 관련 변수
          let deferredPrompt;
          const installBtn = document.getElementById('installBtn');
+         
+         // 만료 관련 상수
+         const EXPIRATION_KEY = '32g-gpt-tools-expiration';
+         const EXPIRATION_DAYS = 60;
+         
+         // 만료 날짜 확인 및 표시 함수
+         function checkAndDisplayExpiration() {
+             const expirationDateStr = localStorage.getItem(EXPIRATION_KEY);
+             if (!expirationDateStr) return;
+             
+             const expirationDate = new Date(expirationDateStr);
+             const currentDate = new Date();
+             const daysLeft = Math.ceil((expirationDate - currentDate) / (1000 * 60 * 60 * 24));
+             
+             // 푸터에 만료 정보 추가
+             const footer = document.querySelector('footer');
+             const expirationInfo = document.createElement('p');
+             expirationInfo.style.fontSize = '12px';
+             expirationInfo.style.marginTop = '5px';
+             
+             if (daysLeft > 0) {
+                 expirationInfo.textContent = `앱 사용 기간: 남은 ${daysLeft}일 (${expirationDate.toLocaleDateString()} 만료)`;
+                 expirationInfo.style.color = daysLeft <= 7 ? '#ff3b30' : '#8e8e93';
+             } else {
+                 expirationInfo.textContent = '앱 사용 기간이 만료되었습니다. 재설치가 필요합니다.';
+                 expirationInfo.style.color = '#ff3b30';
+             }
+             
+             footer.appendChild(expirationInfo);
+         }
 
          // PWA 설치 프롬프트 감지
          window.addEventListener('beforeinstallprompt', (e) => {
@@ -290,6 +320,16 @@
              // 프롬프트 참조 해제
              deferredPrompt = null;
              console.log('PWA was installed');
+             
+             // 설치 시 만료 날짜 설정 (현재 날짜 + 60일)
+             const installDate = new Date();
+             const expirationDate = new Date(installDate);
+             expirationDate.setDate(installDate.getDate() + EXPIRATION_DAYS);
+             localStorage.setItem(EXPIRATION_KEY, expirationDate.toISOString());
+             console.log('앱 만료 날짜 설정:', expirationDate.toLocaleDateString());
+             
+             // 페이지 새로고침하여 만료 정보 표시
+             window.location.reload();
          });
 
          // 서비스 워커 등록
@@ -297,6 +337,8 @@
              window.addEventListener('load', function() {
                  navigator.serviceWorker.register('./sw.js').then(function(registration) {
                      console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                     // 만료 날짜 확인 및 표시
+                     checkAndDisplayExpiration();
                  }, function(err) {
                      console.log('ServiceWorker registration failed: ', err);
                  });
