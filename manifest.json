@@ -1,0 +1,23 @@
+{
+  "name": "32기 문제해결 GPT Tools",
+  "short_name": "32G GPT",
+  "description": "사장님의 문제해결 솔루션 - 마가 32기 전용",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0071e3",
+  "icons": [
+    {
+      "src": "mp1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "mp1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
